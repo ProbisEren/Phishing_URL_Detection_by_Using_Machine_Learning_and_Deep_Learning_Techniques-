@@ -1,0 +1,61 @@
+# =========================
+# Python
+# =========================
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+.Python
+.env
+.venv/
+venv/
+ENV/
+env/
+
+# =========================
+# OS / Editor
+# =========================
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*.swo
+*.tmp
+
+# =========================
+# Jupyter / Cache
+# =========================
+.ipynb_checkpoints/
+
+# =========================
+# Data files (DO NOT PUSH)
+# =========================
+data/raw/*.csv
+data/raw/*.json
+data/processed/*.csv
+data/processed/*.pkl
+
+# =========================
+# Trained models / histories
+# =========================
+*.h5
+*.keras
+*.pt
+*.pth
+
+# =========================
+# Results & Figures
+# =========================
+results/
+figures/
+
+# =========================
+# Logs
+# =========================
+*.log
+
+# =========================
+# System / Misc
+# =========================
+Thumbs.db
