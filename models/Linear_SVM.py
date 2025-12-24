@@ -1,17 +1,16 @@
 import sys
 import os
-
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 import csv
+import pandas as pd
 from sklearn.svm import LinearSVC
 from sklearn.metrics import accuracy_score, classification_report
 from features.BoW_Features import extract_bow_features
 
 
 def load_csv(path):
-    texts = []
-    labels = []
+    texts, labels = [], []
     with open(path, newline="", encoding="utf-8") as f:
         reader = csv.reader(f)
         next(reader)
@@ -23,7 +22,6 @@ def load_csv(path):
 
 def run_linear_svm():
     print("[INFO] Loading train / test data...")
-
     X_train_texts, y_train = load_csv("data/processed/train.csv")
     X_test_texts, y_test = load_csv("data/processed/test.csv")
 
@@ -40,6 +38,13 @@ def run_linear_svm():
 
     print("Accuracy:", accuracy_score(y_test, y_pred))
     print(classification_report(y_test, y_pred))
+
+    report = classification_report(y_test, y_pred, output_dict=True)
+    pd.DataFrame(report).transpose().to_csv(
+        "results/linear_svm_bow_report.csv"
+    )
+
+    print("[SUCCESS] Linear SVM (BoW) report saved")
 
 
 if __name__ == "__main__":

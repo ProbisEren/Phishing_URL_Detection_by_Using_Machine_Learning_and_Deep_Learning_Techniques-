@@ -44,11 +44,6 @@ data/processed/*.pkl
 *.pt
 *.pth
 
-# =========================
-# Results & Figures
-# =========================
-results/
-figures/
 
 # =========================
 # Logs

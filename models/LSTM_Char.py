@@ -11,11 +11,12 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Embedding, LSTM, Dense, Dropout
 from tensorflow.keras.callbacks import EarlyStopping
 from sklearn.metrics import classification_report, accuracy_score
+import pandas as pd
+from sklearn.metrics import classification_report
 
 
-
-MAX_CHARS = 200        # URL'ler kısa, yeterli
-VOCAB_SIZE = 100       # karakter seti küçük
+MAX_CHARS = 200
+VOCAB_SIZE = 100
 EMBED_DIM = 32
 LSTM_UNITS = 64
 BATCH_SIZE = 128
@@ -94,6 +95,12 @@ def run_lstm():
     print("Accuracy:", accuracy_score(y_test, y_pred))
     print(classification_report(y_test, y_pred))
 
+
+    report = classification_report(y_test, y_pred, output_dict=True)
+    df = pd.DataFrame(report).transpose()
+    df.to_csv("results/lstm_char_report.csv")
+
+    print("[SUCCESS] LSTM Character-level report saved")
 
 if __name__ == "__main__":
     run_lstm()

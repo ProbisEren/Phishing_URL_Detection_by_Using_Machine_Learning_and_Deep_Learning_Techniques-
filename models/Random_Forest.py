@@ -7,6 +7,8 @@ import csv
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, classification_report
 from features.Custom_Features import extract_custom_features
+import pandas as pd
+from sklearn.metrics import classification_report
 
 
 def load_csv(path):
@@ -46,6 +48,12 @@ def run_random_forest():
     print("Accuracy:", accuracy_score(y_test, y_pred))
     print(classification_report(y_test, y_pred))
 
+
+    report = classification_report(y_test, y_pred, output_dict=True)
+    df = pd.DataFrame(report).transpose()
+    df.to_csv("results/random_forest_report.csv")
+
+    print("[SUCCESS] Random Forest report saved")
 
 if __name__ == "__main__":
     run_random_forest()

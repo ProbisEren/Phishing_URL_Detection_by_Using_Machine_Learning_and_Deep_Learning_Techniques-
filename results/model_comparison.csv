@@ -1,0 +1,6 @@
+Model,Accuracy,Precision_avg,Recall_avg,F1_avg
+Logistic Regression (BoW),0.9964768883878241,1.0,1.0,1.0
+Logistic Regression (TF-IDF),0.9915445321307779,0.99,0.99,0.99
+Linear SVM (BoW),0.9968996617812852,1.0,1.0,1.0
+Random Forest (Custom Features),0.9634301014656145,0.96,0.96,0.96
+LSTM (Char-based),0.9959836527621195,1.0,1.0,1.0
