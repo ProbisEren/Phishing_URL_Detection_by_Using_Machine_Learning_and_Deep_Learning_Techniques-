@@ -1,255 +1,296 @@
-# ============================================================
-# Phishing URL Detection by Using Machine Learning
-# ============================================================
+Phishing URL Detection using Machine Learning
+=============================================
 
-# ------------------------------------------------------------
-# PROJECT OVERVIEW
-# ------------------------------------------------------------
-# - Task        : Binary Classification (Phishing vs Legitimate)
-# - Domain      : Cyber Security / Web Security
-# - Course      : Learning From Data
-# - Approach    : Classical ML + Deep Learning
-# - Labels      :
-#     1 -> Phishing
-#     0 -> Legitimate
-# - Goal        :
-#     Detect phishing URLs automatically using learned patterns
-#     from real-world phishing and legitimate website data.
-# ------------------------------------------------------------
+Course        : Learning from Data
+Task          : Binary Classification (Phishing vs Legitimate)
+Approach      : Classical Machine Learning + Deep Learning
+Labels        :
+    1 -> Phishing
+    0 -> Legitimate
 
+Goal:
+    Detect phishing URLs automatically by learning patterns
+    from real-world phishing and legitimate website data.
 
-# ------------------------------------------------------------
-# DATASET SUMMARY
-# ------------------------------------------------------------
-# - Phishing URLs :
-#     Source : PhishTank (API + scraping)
-#     Count  : 47303
-#
-# - Legitimate URLs :
-#     Source : Tranco Top Websites (API + local CSV)
-#     Count  : 50000
-#
-# - Total Samples :
-#     97303 URLs
-#
-# - Class Balance :
-#     Balanced during merging step
-# ------------------------------------------------------------
+------------------------------------------------------------
 
+Dataset Description
+-------------------
 
-# ------------------------------------------------------------
-# PROJECT DIRECTORY STRUCTURE
-# ------------------------------------------------------------
-LFD_Project
-├── analysis
-│   ├── model_comparison.py          # compares all model performances
-│   ├── plot_learning_curve.py       # generates learning curve figures
-│   └── show_learning_curves.py      # displays saved learning curves
-│
-├── data
-│   ├── raw
-│   │   ├── phishing_urls.json       # raw phishing URLs from PhishTank
-│   │   ├── phishing_urls.csv
-│   │   ├── legit_urls.json          # raw legit URLs from Tranco
-│   │   ├── legit_urls.csv
-│   │   └── tranco_top_sites.csv
-│   │
-│   └── processed
-│       ├── final_dataset.csv        # merged & labeled dataset
-│       ├── train.csv
-│       ├── val.csv
-│       ├── test.csv
-│       └── lstm_history.pkl         # training history of LSTM
-│
-├── features
-│   ├── BoW_Features.py              # Bag-of-Words feature extraction
-│   ├── tfidf_Features.py            # TF-IDF feature extraction
-│   ├── Custom_Features.py           # handcrafted URL features
-│   └── __init__.py                  # makes features a Python package
-│
-├── models
-│   ├── Logistic_Regression.py       # BoW + Logistic Regression
-│   ├── Logistic_Regression_TFIDF.py # TF-IDF + Logistic Regression
-│   ├── Linear_SVM.py                # BoW + Linear SVM
-│   ├── Random_Forest.py             # Custom URL features + RF
-│   └── LSTM_Char.py                 # Character-level LSTM
-│
-├── preprocessing
-│   └── Split_Dataset.py             # train / val / test split
-│
-├── scraping
-│   ├── PhishTank_Scraper.py         # phishing URL collection
-│   ├── Legit_URL_Scraper.py         # legitimate URL collection
-│   ├── Merge_Datasets.py            # dataset merging & balancing
-│   └── fix_phishing_csv.py          # cleaning phishing URLs
-│
-├── figures
-│   └── learning_curves
-│       ├── lstm_accuracy_curve.png
-│       └── lstm_loss_curve.png
-│
-├── results
-│   └── model_comparison.csv         # final model results table
-│
-├── requirements.txt
-└── README.md
-# ------------------------------------------------------------
+Data sources:
+    - Phishing URLs   : PhishTank platform
+    - Legitimate URLs : Tranco Top Sites list (via API and CSV)
 
+Dataset statistics:
+    - Phishing URLs   : ~47,000
+    - Legitimate URLs : ~50,000
+    - Total samples   : ~97,000
+    - Class balance   : ~50% phishing, ~50% legitimate
 
-# ------------------------------------------------------------
-# DATA COLLECTION
-# ------------------------------------------------------------
+------------------------------------------------------------
 
-# Step 1: Phishing URL Collection
-# - Script  : scraping/PhishTank_Scraper.py
-# - Method  :
-#     - API request to PhishTank
-#     - JSON parsing
-# - Output  :
-#     - data/raw/phishing_urls.json
-#     - data/raw/phishing_urls.csv
+Project Structure
+-----------------
 
-# Step 2: Legitimate URL Collection
-# - Script  : scraping/Legit_URL_Scraper.py
-# - Method  :
-#     - Tranco API request (if available)
-#     - Local CSV fallback (tranco_top_sites.csv)
-# - Output  :
-#     - data/raw/legit_urls.json
-#     - data/raw/legit_urls.csv
+LFD_Project/
+|
+|-- analysis/
+|   |-- model_comparison.py
+|   |-- plot_learning_curve.py
+|   |-- show_learning_curves.py
+|
+|-- data/
+|   |-- raw/
+|   |   |-- phishing_urls.json
+|   |   |-- phishing_urls.csv
+|   |   |-- legit_urls.json
+|   |   |-- legit_urls.csv
+|   |   |-- tranco_top_sites.csv
+|   |
+|   |-- processed/
+|       |-- final_dataset.csv
+|       |-- train.csv
+|       |-- val.csv
+|       |-- test.csv
+|       |-- lstm_history.pkl
+|
+|-- features/
+|   |-- BoW_Features.py
+|   |-- tfidf_Features.py
+|   |-- Custom_Features.py
+|   |-- __init__.py
+|
+|-- models/
+|   |-- Logistic_Regression.py
+|   |-- Logistic_Regression_TFIDF.py
+|   |-- Linear_SVM.py
+|   |-- Random_Forest.py
+|   |-- LSTM_Char.py
+|
+|-- preprocessing/
+|   |-- Split_Dataset.py
+|
+|-- scraping/
+|   |-- PhishTank_Scraper.py
+|   |-- Legit_URL_Scraper.py
+|   |-- Merge_Datasets.py
+|   |-- fix_phishing_csv.py
+|
+|-- figures/
+|   |-- learning_curves/
+|       |-- lstm_accuracy_curve.png
+|       |-- lstm_loss_curve.png
+|
+|-- results/
+|   |-- model_comparison.csv
+|
+|-- requirements.txt
+|-- .gitignore
+|-- README.md
 
+------------------------------------------------------------
 
-# ------------------------------------------------------------
-# DATA PREPROCESSING PIPELINE
-# ------------------------------------------------------------
+Data Collection
+---------------
 
-# Step 1: Phishing URL Cleaning
-# - Script  : scraping/fix_phishing_csv.py
-# - Actions :
-#     - remove empty URLs
-#     - remove invalid entries
-#     - normalize formatting
+Step 1: Collect phishing URLs
+    Source : PhishTank
+    Script : scraping/PhishTank_Scraper.py
+    Output :
+        data/raw/phishing_urls.json
+        data/raw/phishing_urls.csv
 
-# Step 2: Dataset Merging
-# - Script  : scraping/Merge_Datasets.py
-# - Actions :
-#     - merge phishing & legitimate URLs
-#     - assign labels
-#     - balance dataset
-# - Output  :
-#     - data/processed/final_dataset.csv
+Step 2: Collect legitimate URLs
+    Source : Tranco Top Sites
+    Script : scraping/Legit_URL_Scraper.py
+    Output :
+        data/raw/legit_urls.json
+        data/raw/legit_urls.csv
 
-# Step 3: Train / Validation / Test Split
-# - Script  : preprocessing/Split_Dataset.py
-# - Ratios  :
-#     - Train : 70%
-#     - Val   : 15%
-#     - Test  : 15%
-# - Output  :
-#     - train.csv
-#     - val.csv
-#     - test.csv
+------------------------------------------------------------
 
+Data Preprocessing
+------------------
 
-# ------------------------------------------------------------
-# FEATURE EXTRACTION
-# ------------------------------------------------------------
+Steps:
+    1. Merge phishing and legitimate datasets
+    2. Assign labels (1 = phishing, 0 = legitimate)
+    3. Shuffle and balance the dataset
+    4. Split dataset into:
+        - Training set
+        - Validation set
+        - Test set
 
-# Bag-of-Words (BoW)
-# - File   : features/BoW_Features.py
-# - Used by:
-#     - Logistic_Regression.py
-#     - Linear_SVM.py
+Script used:
+    preprocessing/Split_Dataset.py
 
-# TF-IDF
-# - File   : features/tfidf_Features.py
-# - Used by:
-#     - Logistic_Regression_TFIDF.py
+------------------------------------------------------------
 
-# Custom URL Features
-# - File   : features/Custom_Features.py
-# - Features include:
-#     - URL length
-#     - number of dots
-#     - number of digits
-#     - number of special characters
-#     - presence of IP address
-#     - HTTPS usage
-#     - suspicious keywords
-# - Used by:
-#     - Random_Forest.py
+Feature Extraction
+------------------
 
+Classical ML features:
+    - Bag of Words (BoW)
+    - TF-IDF
 
-# ------------------------------------------------------------
-# MODELS
-# ------------------------------------------------------------
+Custom URL-based features:
+    - URL length
+    - Number of digits
+    - Number of special characters
+    - Number of subdomains
+    - Presence of IP address
+    - Suspicious keywords
 
-# Logistic Regression (BoW)
-# - File : models/Logistic_Regression.py
+Deep Learning features:
+    - Character-level tokenization
+    - Fixed-length padded character sequences
 
-# Logistic Regression (TF-IDF)
-# - File : models/Logistic_Regression_TFIDF.py
+------------------------------------------------------------
 
-# Linear Support Vector Machine
-# - File : models/Linear_SVM.py
+Models Implemented
+------------------
 
-# Random Forest Classifier
-# - File : models/Random_Forest.py
+Classical Machine Learning:
+    - Logistic Regression (BoW)
+    - Logistic Regression (TF-IDF)
+    - Linear Support Vector Machine
+    - Random Forest
 
-# Character-Level LSTM
-# - File : models/LSTM_Char.py
-# - Tokenization : character-based
-# - Architecture :
-#     - Embedding
-#     - LSTM
-#     - Dropout
-#     - Dense (sigmoid)
+Deep Learning:
+    - Character-level LSTM
+        * Embedding layer
+        * LSTM layer
+        * Dropout for regularization
+        * Sigmoid output layer
 
+------------------------------------------------------------
 
-# ------------------------------------------------------------
-# MODEL EVALUATION
-# ------------------------------------------------------------
+Evaluation
+----------
 
-# Metrics :
-# - Accuracy
-# - Precision
-# - Recall
-# - F1-score
+Metrics used:
+    - Accuracy
+    - Precision
+    - Recall
+    - F1-score
 
-# Learning Curves :
-# - Accuracy curve
-# - Loss curve
-# - Saved in figures/learning_curves/
+Additional analysis:
+    - Learning curves for LSTM model
+    - Model performance comparison
 
-# Model Comparison :
-# - Script : analysis/model_comparison.py
-# - Output : results/model_comparison.csv
+Results saved in:
+    results/model_comparison.csv
 
+------------------------------------------------------------
 
-# ------------------------------------------------------------
-# HOW TO RUN
-# ------------------------------------------------------------
+How to Run (Step-by-step)
+=========================
 
-# 1) Install dependencies
-#    pip install -r requirements.txt
-#
-# 2) Run scraping scripts
-#    python scraping/PhishTank_Scraper.py
-#    python scraping/Legit_URL_Scraper.py
-#
-# 3) Preprocess data
-#    python scraping/fix_phishing_csv.py
-#    python scraping/Merge_Datasets.py
-#    python preprocessing/Split_Dataset.py
-#
-# 4) Train models
-#    python -m models.Logistic_Regression
-#    python -m models.Logistic_Regression_TFIDF
-#    python -m models.Linear_SVM
-#    python -m models.Random_Forest
-#    python -m models.LSTM_Char
-#
-# 5) Analyze results
-#    python analysis/model_comparison.py
-#    python analysis/plot_learning_curve.py
-# ------------------------------------------------------------
+0) Go to project folder
+-----------------------
+cd /Users/metinerenuzun/PycharmProjects/LFD_Project
+
+1) Create & activate virtual environment
+----------------------------------------
+python3 -m venv .venv
+source .venv/bin/activate
+
+2) Install dependencies
+-----------------------
+pip install --upgrade pip
+pip install -r requirements.txt
+
+3) Data Collection (Scraping)
+-----------------------------
+
+3.1) Collect phishing URLs (PhishTank)
+--------------------------------------
+python scraping/PhishTank_Scraper.py
+
+Expected outputs:
+    data/raw/phishing_urls.json
+    data/raw/phishing_urls.csv
+
+3.2) Collect legitimate URLs (Tranco)
+-------------------------------------
+python scraping/Legit_URL_Scraper.py
+
+Expected outputs:
+    data/raw/legit_urls.json
+    data/raw/legit_urls.csv
+
+4) Merge datasets (50/50 balance)
+--------------------------------
+python scraping/Merge_Datasets.py
+
+Expected output:
+    data/processed/final_dataset.csv
+
+5) Split into train / val / test
+--------------------------------
+python preprocessing/Split_Dataset.py
+
+Expected outputs:
+    data/processed/train.csv
+    data/processed/val.csv
+    data/processed/test.csv
+
+6) Train & Evaluate Models
+--------------------------
+
+IMPORTANT:
+    Always run models with "-m" (module mode)
+
+6.1) Logistic Regression (BoW)
+------------------------------
+python -m models.Logistic_Regression
+
+6.2) Logistic Regression (TF-IDF)
+---------------------------------
+python -m models.Logistic_Regression_TFIDF
+
+6.3) Linear SVM (BoW)
+---------------------
+python -m models.Linear_SVM
+
+6.4) Random Forest (Custom URL Features)
+----------------------------------------
+python -m models.Random_Forest
+
+6.5) LSTM (Character-level)
+---------------------------
+python -m models.LSTM_Char
+
+Expected extra output:
+    data/processed/lstm_history.pkl
+
+7) Analysis (Plots + Comparison)
+--------------------------------
+
+7.1) Create learning curve figures (LSTM)
+-----------------------------------------
+python analysis/plot_learning_curve.py
+
+Expected outputs:
+    figures/learning_curves/lstm_accuracy_curve.png
+    figures/learning_curves/lstm_loss_curve.png
+
+7.2) Show learning curves (open both images)
+--------------------------------------------
+python analysis/show_learning_curves.py
+
+7.3) Create model comparison table
+----------------------------------
+mkdir -p results
+python analysis/model_comparison.py
+
+Expected output:
+    results/model_comparison.csv
+
+------------------------------------------------------------
+
+Notes
+-----
+
+Large datasets and generated files are excluded from version control
+using .gitignore.
