@@ -1,49 +1,86 @@
 ```text
-PHISHING URL DETECTION USING MACHINE LEARNING AND DEEP LEARNING
+PHISHING URL DETECTION BY USING MACHINE LEARNING AND DEEP LEARNING TECHNIQUES
 
-Course        : Learning from Data
-Problem Type  : Binary Classification
-Classes       : 1 -> Phishing, 0 -> Legitimate
+Course       : Learning from Data
+Approach     : Classical Machine Learning + Deep Learning
+Labels       :
+    1 -> Phishing
+    0 -> Legitimate
 
-------------------------------------------------------------
-
-PROBLEM MOTIVATION
-------------------
-Phishing attacks are one of the most common cyber threats.
-Detecting malicious URLs automatically is critical to prevent
-credential theft and financial loss.
+Goal:
+    Detect phishing URLs automatically using learned patterns
+    from real-world phishing and legitimate website data.
 
 ------------------------------------------------------------
 
 DATASET DESCRIPTION
 -------------------
-Phishing URLs   : ~47,000 (PhishTank)
-Legitimate URLs : ~50,000 (Tranco Top Sites via API and CSV)
-Total Samples   : ~97,000
-Class Balance   : ~50% phishing / ~50% legitimate
+Data sources:
+    - Phishing URLs   : PhishTank platform
+    - Legitimate URLs : Tranco Top Sites list (via API and CSV)
 
-------------------------------------------------------------
-
-PROJECT OBJECTIVE
------------------
-To build and compare classical machine learning and deep learning
-models for phishing URL detection using real-world data.
+Dataset statistics:
+    - Phishing URLs   : ~47,000
+    - Legitimate URLs : ~50,000
+    - Total samples   : ~97,000
+    - Class balance   : ~50% phishing, ~50% legitimate
 
 ------------------------------------------------------------
 
 PROJECT STRUCTURE
------------------
+----------------
 LFD_Project/
 |
 |-- analysis/
-|-- data/raw/
-|-- data/processed/
+|   |-- model_comparison.py
+|   |-- plot_learning_curve.py
+|   |-- show_learning_curves.py
+|
+|-- data/
+|   |-- raw/
+|   |   |-- phishing_urls.json
+|   |   |-- phishing_urls.csv
+|   |   |-- legit_urls.json
+|   |   |-- legit_urls.csv
+|   |   |-- tranco_top_sites.csv
+|   |
+|   |-- processed/
+|       |-- final_dataset.csv
+|       |-- train.csv
+|       |-- val.csv
+|       |-- test.csv
+|       |-- lstm_history.pkl
+|
 |-- features/
+|   |-- BoW_Features.py
+|   |-- tfidf_Features.py
+|   |-- Custom_Features.py
+|   |-- __init__.py
+|
 |-- models/
+|   |-- Logistic_Regression.py
+|   |-- Logistic_Regression_TFIDF.py
+|   |-- Linear_SVM.py
+|   |-- Random_Forest.py
+|   |-- LSTM_Char.py
+|
 |-- preprocessing/
+|   |-- Split_Dataset.py
+|
 |-- scraping/
+|   |-- PhishTank_Scraper.py
+|   |-- Legit_URL_Scraper.py
+|   |-- Merge_Datasets.py
+|   |-- fix_phishing_csv.py
+|
 |-- figures/
+|   |-- learning_curves/
+|       |-- lstm_accuracy_curve.png
+|       |-- lstm_loss_curve.png
+|
 |-- results/
+|   |-- model_comparison.csv
+|
 |-- requirements.txt
 |-- .gitignore
 |-- README.md
@@ -52,58 +89,103 @@ LFD_Project/
 
 DATA COLLECTION
 ---------------
-1) Phishing URLs
-   Source : PhishTank
-   Script : scraping/PhishTank_Scraper.py
+Step 1:
+    Collect phishing URLs
+    Source : PhishTank
+    Script : scraping/PhishTank_Scraper.py
+    Output :
+        data/raw/phishing_urls.json
+        data/raw/phishing_urls.csv
 
-2) Legitimate URLs
-   Source : Tranco Top Sites
-   Script : scraping/Legit_URL_Scraper.py
+Step 2:
+    Collect legitimate URLs
+    Source : Tranco Top Sites
+    Script : scraping/Legit_URL_Scraper.py
+    Output :
+        data/raw/legit_urls.json
+        data/raw/legit_urls.csv
 
 ------------------------------------------------------------
 
-PREPROCESSING PIPELINE
-----------------------
-1) Merge datasets
-2) Assign labels
-3) Shuffle and balance
-4) Train / Validation / Test split
+DATA PREPROCESSING
+-----------------
+Steps:
+    1) Merge phishing and legitimate datasets
+    2) Assign labels (1 = phishing, 0 = legitimate)
+    3) Shuffle and balance the dataset
+    4) Split into train / validation / test sets
+
+Script:
+    preprocessing/Split_Dataset.py
 
 ------------------------------------------------------------
 
 FEATURE EXTRACTION
-------------------
-BoW features
-TF-IDF features
-Custom URL features (length, digits, symbols, subdomains, IP usage)
-Character-level tokenization (LSTM)
+-----------------
+Text-based features:
+    - Bag of Words (BoW)
+    - TF-IDF
+
+Custom URL features:
+    - URL length
+    - Number of digits
+    - Number of special characters
+    - Number of subdomains
+    - Presence of IP address
+    - Suspicious keywords
+
+Deep learning features:
+    - Character-level tokenization
+    - Fixed-length padded sequences
 
 ------------------------------------------------------------
 
 MODELS
 ------
-Logistic Regression (BoW)
-Logistic Regression (TF-IDF)
-Linear SVM
-Random Forest
-Character-level LSTM
+Classical ML:
+    - Logistic Regression (BoW)
+    - Logistic Regression (TF-IDF)
+    - Linear SVM
+    - Random Forest
+
+Deep Learning:
+    - Character-level LSTM with dropout
 
 ------------------------------------------------------------
 
 EVALUATION
 ----------
-Metrics : Accuracy, Precision, Recall, F1-score
-Learning curves and model comparison included.
+Metrics:
+    - Accuracy
+    - Precision
+    - Recall
+    - F1-score
+
+Additional analysis:
+    - Learning curves (loss & accuracy)
+    - Model comparison table
 
 ------------------------------------------------------------
 
 HOW TO RUN
 ----------
-1) pip install -r requirements.txt
-2) python scraping/PhishTank_Scraper.py
-3) python scraping/Legit_URL_Scraper.py
-4) python scraping/Merge_Datasets.py
-5) python preprocessing/Split_Dataset.py
-6) python -m models.Logistic_Regression
-7) python -m models.LSTM_Char
+1) Install dependencies:
+    pip install -r requirements.txt
+
+2) Collect data:
+    python scraping/PhishTank_Scraper.py
+    python scraping/Legit_URL_Scraper.py
+
+3) Merge datasets:
+    python scraping/Merge_Datasets.py
+
+4) Split dataset:
+    python preprocessing/Split_Dataset.py
+
+5) Train models:
+    python -m models.Logistic_Regression
+    python -m models.Logistic_Regression_TFIDF
+    python -m models.Linear_SVM
+    python -m models.Random_Forest
+    python -m models.LSTM_Char
 ```
